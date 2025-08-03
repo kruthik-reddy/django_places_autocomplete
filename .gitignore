@@ -1,9 +1,51 @@
+########################################
+#  Python / Django
+########################################
 __pycache__/
-db.sqlite3
-*.pyc
-.env
-/staticfiles/
-# .gitignore
+*.py[cod]
+*.log
+db.sqlite3               # local dev DB
+.env*                    # secrets (.env, .env.prod …)
+
+# Django static & media (collectstatic output)
+staticfiles/             # only if you use STATIC_ROOT = "staticfiles"
+media/                   # uploaded user files
+
+########################################
+#  Virtual environments
+########################################
 .venv/
+env/
+venv/
 
+########################################
+#  Node / Tailwind
+########################################
+node_modules/
+# lock files keep versions; ignore if you don’t want them tracked
+# package-lock.json
+# pnpm-lock.yaml
+# yarn.lock
 
+# Tailwind build artefacts
+assets/css/              # source stays, but not generated cache
+static/css/app.css       # compiled file; can be regenerated
+static/css/*.map
+
+########################################
+#  Docker
+########################################
+*.tar
+**/.dockerignore
+docker-compose.override.yml  # dev-only overrides
+# optional: ignore volumes if you ever bind-mount
+pgdata/
+
+########################################
+#  OS & editor cruft
+########################################
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
