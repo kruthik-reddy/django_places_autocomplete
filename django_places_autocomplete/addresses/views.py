@@ -41,7 +41,7 @@ def address_list_view(request):
 
 
 def geocode_view(request):
-    """Return geocoding results for an address or ``lat``/``lng`` pair."""
+    """Return geocoding results for an ``address`` or a ``lat``/``lng`` pair."""
 
     address = request.GET.get("address")
     lat = request.GET.get("lat")
@@ -54,19 +54,9 @@ def geocode_view(request):
             return JsonResponse({"success": False, "error": str(exc)}, status=400)
         return JsonResponse({"success": True, "results": results})
 
-    if lat or lng:
-        if not lat or not lng:
-            return JsonResponse(
-                {
-                    "success": False,
-                    "error": "Provide both lat and lng parameters",
-                },
-                status=400,
-            )
-
+    if lat and lng:
         try:
-            lat_f = float(lat)
-            lng_f = float(lng)
+            lat_f, lng_f = float(lat), float(lng)
         except ValueError:
             return JsonResponse(
                 {
@@ -81,6 +71,12 @@ def geocode_view(request):
         except Exception as exc:  # pragma: no cover - service error
             return JsonResponse({"success": False, "error": str(exc)}, status=400)
         return JsonResponse({"success": True, "results": results})
+
+    if lat or lng:
+        return JsonResponse(
+            {"success": False, "error": "Provide both lat and lng parameters"},
+            status=400,
+        )
 
     return JsonResponse(
         {
