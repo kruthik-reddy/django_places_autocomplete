@@ -1,7 +1,7 @@
-{% load static %}
-<!DOCTYPE html><html><head>
-  <link rel="stylesheet" href="{% static 'css/app.css' %}">
-</head><body class="bg-gray-50 py-8">
+{% extends "base.html" %}
+{% block title %}Saved Addresses{% endblock %}
+
+{% block content %}
 <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow">
   <h2 class="text-2xl font-bold mb-6">Saved Addresses</h2>
   <table class="w-full text-sm">
@@ -34,4 +34,4 @@
     {% endif %}
   </div>
 </div>
-</body></html>
+{% endblock %}
