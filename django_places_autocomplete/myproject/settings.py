@@ -114,3 +114,8 @@ STATICFILES_STORAGE = (
 # API keys
 # ──────────────────────────────────────────────
 GOOGLE_MAPS_API_KEY = env("GOOGLE_MAPS_API_KEY")
+if not GOOGLE_MAPS_API_KEY:
+    import warnings
+    warnings.warn(
+        "GOOGLE_MAPS_API_KEY is not set; Google services will be unavailable."
+    )
