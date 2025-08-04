@@ -4,6 +4,7 @@ from django.shortcuts import render
 
 from .forms import AddressForm
 from .models import Address
+from .services import geocode_forward, geocode_reverse
 
 
 def address_form_view(request):
@@ -37,3 +38,38 @@ def address_list_view(request):
     return render(request,
                   'addresses/address_list.html',
                   {'page_obj': page_obj})
+
+
+def geocode_view(request):
+    address = request.GET.get("address")
+    lat = request.GET.get("lat")
+    lng = request.GET.get("lng")
+
+    try:
+        if address:
+            results = geocode_forward(address)
+        elif lat and lng:
+            try:
+                lat_f = float(lat)
+                lng_f = float(lng)
+            except ValueError:
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "error": "lat and lng must be valid numbers",
+                    },
+                    status=400,
+                )
+            results = geocode_reverse(lat_f, lng_f)
+        else:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": "Provide either address or both lat and lng parameters",
+                },
+                status=400,
+            )
+
+        return JsonResponse({"success": True, "results": results})
+    except Exception as exc:  # pragma: no cover - defensive programming
+        return JsonResponse({"success": False, "error": str(exc)}, status=400)
