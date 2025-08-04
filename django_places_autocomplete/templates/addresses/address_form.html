@@ -1,56 +1,51 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Enter Address</title>
+{% extends "base.html" %}
+{% block title %}Enter Address{% endblock %}
+{% block body_class %}bg-gray-50 min-h-screen py-8{% endblock %}
 
-  <!-- Production‑ready Tailwind build -->
-  <link rel="stylesheet" href="{% static 'css/app.css' %}">
-</head>
-<body class="bg-gray-50 min-h-screen py-8">
-  <div class="max-w-2xl mx-auto px-4">
-    <div class="bg-white rounded-xl shadow-lg p-8">
-      <h2 class="text-2xl font-bold text-gray-800 mb-6">Enter Your Address</h2>
+{% block content %}
+<div class="max-w-2xl mx-auto px-4">
+  <div class="bg-white rounded-xl shadow-lg p-8">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Enter Your Address</h2>
 
-      <form id="address-form" method="post" class="space-y-6">
-        {% csrf_token %}
+    <form id="address-form" method="post" class="space-y-6">
+      {% csrf_token %}
 
-        <!-- Google Place Autocomplete element mounts here -->
-        <label for="gmp-placeselect" class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
-        <div id="autocomplete-wrapper"></div>
+      <!-- Google Place Autocomplete element mounts here -->
+      <label for="gmp-placeselect" class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
+      <div id="autocomplete-wrapper"></div>
 
-        <!-- Hidden model fields -->
-        {{ form.street_number }}
-        {{ form.route }}
-        {{ form.locality }}
-        {{ form.administrative_area_level_1 }}
-        {{ form.country }}
-        {{ form.postal_code }}
-        {{ form.latitude }}
-        {{ form.longitude }}
+      <!-- Hidden model fields -->
+      {{ form.street_number }}
+      {{ form.route }}
+      {{ form.locality }}
+      {{ form.administrative_area_level_1 }}
+      {{ form.country }}
+      {{ form.postal_code }}
+      {{ form.latitude }}
+      {{ form.longitude }}
 
-        <!-- Live preview -->
-        <div id="address-components" class="hidden bg-gray-50 p-4 rounded-lg text-sm grid grid-cols-2 gap-4">
-          <div><strong>Address:</strong> <span id="display-formatted"></span></div>
-          <div><strong>Street:</strong> <span id="display-street"></span></div>
-          <div><strong>City:</strong>   <span id="display-city"></span></div>
-          <div><strong>State:</strong>  <span id="display-state"></span></div>
-          <div><strong>Country:</strong><span id="display-country"></span></div>
-          <div><strong>Postal:</strong> <span id="display-postal"></span></div>
-          <div><strong>Coords:</strong> <span id="display-coords"></span></div>
-        </div>
+      <!-- Live preview -->
+      <div id="address-components" class="hidden bg-gray-50 p-4 rounded-lg text-sm grid grid-cols-2 gap-4">
+        <div><strong>Address:</strong> <span id="display-formatted"></span></div>
+        <div><strong>Street:</strong> <span id="display-street"></span></div>
+        <div><strong>City:</strong>   <span id="display-city"></span></div>
+        <div><strong>State:</strong>  <span id="display-state"></span></div>
+        <div><strong>Country:</strong><span id="display-country"></span></div>
+        <div><strong>Postal:</strong> <span id="display-postal"></span></div>
+        <div><strong>Coords:</strong> <span id="display-coords"></span></div>
+      </div>
 
-        <button type="submit" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-colors font-medium">
-          Save Address
-        </button>
-      </form>
+      <button type="submit" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-colors font-medium">
+        Save Address
+      </button>
+    </form>
 
-      <div id="message" class="hidden mt-4 p-4 rounded-lg"></div>
-    </div>
+    <div id="message" class="hidden mt-4 p-4 rounded-lg"></div>
   </div>
+</div>
+{% endblock %}
 
+{% block scripts %}
   <!-- Maps JS v=beta (async) -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&v=beta&callback=initGoogle&loading=async"></script>
 
@@ -135,5 +130,4 @@
       }
     });
   </script>
-</body>
-</html>
+{% endblock %}
