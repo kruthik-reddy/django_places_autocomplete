@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.core.paginator import Paginator
 from django.http import JsonResponse
+from django.shortcuts import render
+
 from .forms import AddressForm
 from .models import Address
 
@@ -25,8 +27,7 @@ def address_form_view(request):
 
     form = AddressForm()
     return render(request, 'addresses/address_form.html', {'form': form})
-from django.core.paginator import Paginator
-from .models import Address
+
 
 def address_list_view(request):
     qs = Address.objects.order_by('-created_at')
