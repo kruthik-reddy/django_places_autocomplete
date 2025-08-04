@@ -100,7 +100,7 @@ STATIC_URL = "/static/"
 
 # Tell Django “look for static in /app/static, not inside the app folder.”
 STATICFILES_DIRS = [
-    BASE_DIR.parent / "static",
+    BASE_DIR / "static",
 ]
 
 # Collect into /app/staticfiles
