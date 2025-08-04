@@ -113,6 +113,9 @@
 
       try {
         const res = await fetch(url);
+        if (!res.ok) {
+          throw new Error(`Request failed with status ${res.status}`);
+        }
         const data = await res.json();
         if (data.success && data.results.length) {
           const r = data.results[0];
@@ -125,7 +128,7 @@
         }
       } catch (err) {
         preview.classList.add('hidden');
-        show('Error fetching address data.', 'error');
+        show(err.message || 'Error fetching address data.', 'error');
       }
     }
 
