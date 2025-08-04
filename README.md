@@ -13,7 +13,7 @@ npm run watch:css    # Rebuild on changes
 
 The compiled file is written to `django_places_autocomplete/static/css/app.css` and is included in `base.html` via `{% static %}`.
 
-If the build warns about outdated Browserslist data, update it:
+When the build warns about outdated Browserslist data, refresh the database with:
 
 ```bash
 npm run browserslist:update
