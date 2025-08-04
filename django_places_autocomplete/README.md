@@ -20,3 +20,17 @@ python manage.py runserver
 - Hidden address components
 - AJAX form submission
 - Tailwind CSS styling
+
+### CSS
+
+Build the Tailwind CSS assets:
+
+```bash
+npm run build:css
+```
+
+Watch for changes during development:
+
+```bash
+npm run watch:css
+```
