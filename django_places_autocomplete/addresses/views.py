@@ -41,35 +41,51 @@ def address_list_view(request):
 
 
 def geocode_view(request):
+    """Return geocoding results for an address or ``lat``/``lng`` pair."""
+
     address = request.GET.get("address")
     lat = request.GET.get("lat")
     lng = request.GET.get("lng")
 
-    try:
-        if address:
+    if address:
+        try:
             results = geocode_forward(address)
-        elif lat and lng:
-            try:
-                lat_f = float(lat)
-                lng_f = float(lng)
-            except ValueError:
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "error": "lat and lng must be valid numbers",
-                    },
-                    status=400,
-                )
-            results = geocode_reverse(lat_f, lng_f)
-        else:
+        except Exception as exc:  # pragma: no cover - service error
+            return JsonResponse({"success": False, "error": str(exc)}, status=400)
+        return JsonResponse({"success": True, "results": results})
+
+    if lat or lng:
+        if not lat or not lng:
             return JsonResponse(
                 {
                     "success": False,
-                    "error": "Provide either address or both lat and lng parameters",
+                    "error": "Provide both lat and lng parameters",
                 },
                 status=400,
             )
 
+        try:
+            lat_f = float(lat)
+            lng_f = float(lng)
+        except ValueError:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": "lat and lng must be valid numbers",
+                },
+                status=400,
+            )
+
+        try:
+            results = geocode_reverse(lat_f, lng_f)
+        except Exception as exc:  # pragma: no cover - service error
+            return JsonResponse({"success": False, "error": str(exc)}, status=400)
         return JsonResponse({"success": True, "results": results})
-    except Exception as exc:  # pragma: no cover - defensive programming
-        return JsonResponse({"success": False, "error": str(exc)}, status=400)
+
+    return JsonResponse(
+        {
+            "success": False,
+            "error": "Provide either address or both lat and lng parameters",
+        },
+        status=400,
+    )
