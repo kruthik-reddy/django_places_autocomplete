@@ -4,7 +4,9 @@
 __pycache__/
 *.py[cod]
 *.log
-db.sqlite3               # local dev DB
+# Local SQLite database files
+db.sqlite3
+django_places_autocomplete/db.sqlite3
 .env*                    # secrets (.env, .env.prod …)
 
 # Django static & media (collectstatic output)
