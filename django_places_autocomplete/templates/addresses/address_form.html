@@ -33,6 +33,7 @@
 
         <!-- Live preview -->
         <div id="address-components" class="hidden bg-gray-50 p-4 rounded-lg text-sm grid grid-cols-2 gap-4">
+          <div><strong>Address:</strong> <span id="display-formatted"></span></div>
           <div><strong>Street:</strong> <span id="display-street"></span></div>
           <div><strong>City:</strong>   <span id="display-city"></span></div>
           <div><strong>State:</strong>  <span id="display-state"></span></div>
@@ -88,9 +89,8 @@
       document.getElementById('display-state').textContent   = c.administrative_area_level_1 || '';
       document.getElementById('display-country').textContent = c.country   || '';
       document.getElementById('display-postal').textContent  = c.postal_code || '';
-      document.getElementById('display-coords').textContent  = `${place.location.lat.toFixed(6)}, ${place.location.lng.toFixed(6)}`;
 
-      preview.classList.remove('hidden');
+      geocodeAddress(place.formattedAddress);
     }
 
     function set(id, v='') { const el=document.getElementById(id); if(el) el.value = v; }
@@ -100,6 +100,26 @@
       msgBox.className = `mt-4 p-4 rounded-lg ${type==='success' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'}`;
       msgBox.classList.remove('hidden');
       setTimeout(() => msgBox.classList.add('hidden'), 4000);
+    }
+
+    async function geocodeAddress(query) {
+      if (!query) return;
+      try {
+        const res = await fetch(`/address/geocode/?address=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        if (data.success && data.results.length) {
+          const r = data.results[0];
+          document.getElementById('display-formatted').textContent = r.formatted_address || '';
+          document.getElementById('display-coords').textContent = `${Number(r.latitude).toFixed(6)}, ${Number(r.longitude).toFixed(6)}`;
+          preview.classList.remove('hidden');
+        } else {
+          preview.classList.add('hidden');
+          show('No results found.', 'error');
+        }
+      } catch (err) {
+        preview.classList.add('hidden');
+        show('Error fetching address data.', 'error');
+      }
     }
 
     form.addEventListener('submit', async (e) => {
