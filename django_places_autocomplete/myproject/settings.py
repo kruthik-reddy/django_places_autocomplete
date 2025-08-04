@@ -27,7 +27,6 @@ DEBUG       = env("DEBUG")
 SECRET_KEY  = env("SECRET_KEY")
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
-print("GOOGLE_KEY:", env("GOOGLE_MAPS_API_KEY"))
 
 # ──────────────────────────────────────────────
 # Django basics
