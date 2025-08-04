@@ -8,7 +8,9 @@ import requests
 from django.conf import settings
 from django.core.cache import cache
 
-GEOCODE_ENDPOINT = "https://maps.googleapis.com/maps/api/geocode/json"
+# Endpoints for the (v4) Geocoding API
+GEOCODE_FORWARD_ENDPOINT = "https://geocoding.googleapis.com/v1/geocode:forward"
+GEOCODE_REVERSE_ENDPOINT = "https://geocoding.googleapis.com/v1/geocode:reverse"
 
 
 def _handle_response(data: Dict) -> List[Dict]:
@@ -29,24 +31,38 @@ def _handle_response(data: Dict) -> List[Dict]:
     ------
     RuntimeError
         If the API call did not succeed. The error message provided by the
-        API (``error_message``) is propagated where available.
+        API is propagated where available.
     """
 
-    status = data.get("status")
-    if status != "OK":
-        message = data.get("error_message", status)
+    # New API returns an ``error`` object instead of a status string.
+    if "error" in data:
+        message = data["error"].get("message", "Unknown error")
         raise RuntimeError(message)
 
+    status = data.get("status")
+    if isinstance(status, str) and status != "OK":
+        # Legacy structure
+        message = data.get("error_message", status)
+        raise RuntimeError(message)
+    if isinstance(status, dict):
+        code = status.get("code")
+        if code and code != "OK":
+            raise RuntimeError(status.get("message", code))
+
+    items = data.get("geocodingResults") or data.get("results", [])
+
     results: List[Dict] = []
-    for result in data.get("results", []):
-        geometry = result.get("geometry", {})
-        location = geometry.get("location", {})
+    for result in items:
+        # v4 API returns ``location.latLng``
+        location = result.get("location", {})
+        lat_lng = location.get("latLng", {})
         results.append(
             {
-                "formatted_address": result.get("formatted_address"),
-                "place_id": result.get("place_id"),
-                "latitude": location.get("lat"),
-                "longitude": location.get("lng"),
+                "formatted_address": result.get("formattedAddress")
+                or result.get("formatted_address"),
+                "place_id": result.get("placeId") or result.get("place_id"),
+                "latitude": lat_lng.get("latitude") or location.get("lat"),
+                "longitude": lat_lng.get("longitude") or location.get("lng"),
                 "types": result.get("types", []),
             }
         )
@@ -75,8 +91,11 @@ def geocode_forward(address: str) -> List[Dict]:
     if cached is not None:
         return cached
 
-    params = {"address": address, "key": settings.GOOGLE_MAPS_API_KEY}
-    response = requests.get(GEOCODE_ENDPOINT, params=params, timeout=10)
+    params = {"key": settings.GOOGLE_MAPS_API_KEY}
+    payload = {"address": address}
+    response = requests.post(
+        GEOCODE_FORWARD_ENDPOINT, params=params, json=payload, timeout=10
+    )
     data = response.json()
     results = _handle_response(data)
     cache.set(cache_key, results)
@@ -105,8 +124,11 @@ def geocode_reverse(lat: float, lng: float) -> List[Dict]:
     if cached is not None:
         return cached
 
-    params = {"latlng": f"{lat},{lng}", "key": settings.GOOGLE_MAPS_API_KEY}
-    response = requests.get(GEOCODE_ENDPOINT, params=params, timeout=10)
+    params = {"key": settings.GOOGLE_MAPS_API_KEY}
+    payload = {"latlng": {"latitude": lat, "longitude": lng}}
+    response = requests.post(
+        GEOCODE_REVERSE_ENDPOINT, params=params, json=payload, timeout=10
+    )
     data = response.json()
     results = _handle_response(data)
     cache.set(cache_key, results)
