@@ -13,6 +13,12 @@ npm run watch:css    # Rebuild on changes
 
 The compiled file is written to `django_places_autocomplete/static/css/app.css` and is included in `base.html` via `{% static %}`.
 
+If the build warns about outdated Browserslist data, update it:
+
+```bash
+npm run browserslist:update
+```
+
 ## Tests
 
 Run Django tests with:
